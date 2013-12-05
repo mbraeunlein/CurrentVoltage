@@ -1,10 +1,39 @@
 import serial
 import time
 import sys
+import threading
+import numpy as np
+from matplotlib import pyplot as plt
+
+ydata = [0] * int(sys.argv[2])
+
+
+class FuncThread(threading.Thread):
+    def __init__(self, target, *args):
+        self._target = target
+        self._args = args
+        threading.Thread.__init__(self)
+ 
+    def run(self):
+        self._target(*self._args)
+ 
+ 
+def plot():
+    plt.ion()
+    ax1=plt.axes()
+    line, = plt.plot(ydata)
+    plt.ylim([0,40])
+    
+    while True:
+        try:
+            line.set_xdata(np.arange(len(ydata)))
+            line.set_ydata(ydata)
+            plt.draw()
+        except:
+            pass
+            
 
 def read(seconds):
-    print("reading data for " + seconds + " seconds")
-    
     port = serial.Serial('/dev/ttyUSB0', 115200)
     abc=open('data.txt', 'w+')  
     start = time.time()
@@ -17,20 +46,30 @@ def read(seconds):
         x = port.readline()
         x.strip()
         if (x != ""):
-        	abc.write(x)
+            try:
+                ydata.append(float(x))
+                del ydata[0]
+                abc.write(x)
+            except:
+                pass
 
     abc.close()
     port.close()
     
+    print("finished reading")
     
-read(sys.argv[1])
 
-print("finished reading")
+t1 = FuncThread(read, sys.argv[1])
+t2 = FuncThread(plot, )
+t1.start()
+time.sleep(3)
+t2.start()
+t1.join()
 
 f = open('data.txt', 'r')
 lastValue = 0.0
 # reference voltage
-refVol = 1.1
+refVol = 0.45
 # accuracy is 10bit, 0 to 1023
 maxVal = 1023
 # compute the scale multiplikator for the data (in words this is what a 1 on the serial port would stand for)
@@ -49,7 +88,7 @@ for line in f:
         area = area + (((lastValue + line) / 2))
         lastValue = line
         count = count + 1
-    except :
+    except:
         pass
 
 if count > 0:
