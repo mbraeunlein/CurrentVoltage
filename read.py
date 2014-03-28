@@ -4,6 +4,7 @@ import time
 import datetime
 import struct
 import numpy as np
+import pdb
 
 baudrate = 115200
 seconds = sys.argv[1]
@@ -21,8 +22,11 @@ while (float(time.time() - start)) < float(seconds):
 		last = last + 10
 
 	t = datetime.datetime.now()
-	x = port.read(interval)
-	buf = struct.unpack('2000B',x)
+	buf = np.int_([port.readline().strip() for i in range(interval)])
+	
+	#~ x = port.read(interval)
+	#~ buf = struct.unpack('2000B',x)
+	
 	dta.append((t,buf))
 				
 	try:
