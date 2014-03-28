@@ -11,6 +11,7 @@ seconds = sys.argv[1]
 start = time.time()
 last  = 0
 dta = []
+dtamn = []
 interval = 2000
 ydata = np.zeros(interval)
 
@@ -28,7 +29,7 @@ while (float(time.time() - start)) < float(seconds):
 	#~ buf = struct.unpack('2000B',x)
 	
 	dta.append((t,buf))
-				
+	dtamn.append(np.mean(buf))
 	try:
 		ydata = np.concatenate( (ydata, buf) )[len(buf):]
 	except:
@@ -36,4 +37,5 @@ while (float(time.time() - start)) < float(seconds):
 	
 port.close()
 print("finished reading")
-np.save('data.npy',dta)
+np.save('data-132.npy',dta)
+np.save(sys.argv[2],dtamn)
