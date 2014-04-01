@@ -37,5 +37,4 @@ while (float(time.time() - start)) < float(seconds):
 	
 port.close()
 print("finished reading")
-np.save('data-132.npy',dta)
-np.save(sys.argv[2],dtamn)
+np.save(sys.argv[2],dta)
