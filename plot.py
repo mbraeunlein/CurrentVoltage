@@ -4,28 +4,34 @@ import sys
 
 filename = sys.argv[1]
 threshold = int(sys.argv[2])
-running = False
-start = 0
-indices = []
-dist = 100
-count = 0
+
+dist = 20
+minPeekLength = 30
 
 rawData = np.load(filename)
 data = np.concatenate(np.array(rawData)[:,1].flatten())
+
+start = 0
+indices = []
+count = 0
+running = False
 
 for idx, val in enumerate(data):
 	if val > threshold:
 		if not running:
 			running = True
 			start = idx
+		else:
+			count = 0
 	if val < threshold:
 		if running:
 			if dist > count:
 				count = count + 1
 			else:
-				count = 0
 				running = False
-				indices.append((start, idx - dist))
+				if ((idx - count) - start) > minPeekLength:
+					indices.append((start, idx - count))
+				count = 0
 
 for i in indices:
 	if max(data[i[0]:i[1]]) > 700:
