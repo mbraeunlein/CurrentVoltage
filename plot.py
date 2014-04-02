@@ -16,11 +16,11 @@ def smooth(x,window_len=11,window='hanning'):
 	s = np.r_[x[window_len-1:0:-1],x,x[-1:-window_len:-1]]
 
 	if window == 'flat':
-		w = numpy.ones(window_len,'d')
+		w = np.ones(window_len,'d')
 	else:
-		w = eval('numpy.'+window+'(window_len)')
+		w = eval('np.'+window+'(window_len)')
 
-	y = numpy.convolve(w/w.sum(),s,mode='valid')
+	y = np.convolve(w/w.sum(),s,mode='valid')
 	return y
 
 
