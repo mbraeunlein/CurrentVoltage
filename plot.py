@@ -2,11 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
+plt.ion()
+
 filename = sys.argv[1]
 threshold = int(sys.argv[2])
 
 dist = 20
-minPeekLength = 30
+minPeekLength = 19
 
 rawData = np.load(filename)
 data = np.concatenate(np.array(rawData)[:,1].flatten())
@@ -33,11 +35,13 @@ for idx, val in enumerate(data):
 					indices.append((start, idx - count))
 				count = 0
 
+plt.figure(figsize=(10,6),dpi=85,facecolor='w',edgecolor='k')
+plt.plot(data,'-',label='no. 127')
+
 for i in indices:
 	if max(data[i[0]:i[1]]) > 700:
 		plt.axvspan(i[0], i[1], facecolor='r', alpha=0.2)
 	else:
 		plt.axvspan(i[0], i[1], facecolor='g', alpha=0.2)
 
-plt.plot(data,'-',label='no. 127')
 plt.show()
