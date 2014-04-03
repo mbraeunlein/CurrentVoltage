@@ -39,6 +39,7 @@ indices = []
 count = 0
 running = False
 
+# detect peeks
 for idx, val in enumerate(data):
 	if val > threshold:
 		if not running:
@@ -56,13 +57,29 @@ for idx, val in enumerate(data):
 					indices.append((start, idx - count))
 				count = 0
 
-plt.figure(figsize=(10,6),dpi=85,facecolor='w',edgecolor='k')
-plt.plot(data,'-',label='no. 127')
+# categorize peeks
+smallPeeks = []
+bigPeeks = []
 
 for i in indices:
 	if max(data[i[0]:i[1]]) > 700:
-		plt.axvspan(i[0], i[1], facecolor='r', alpha=0.2)
+		bigPeeks.append(i)
 	else:
+		smallPeeks.append(i)
+
+# plot data
+plot(smallPeeks, bigPeeks)
+
+def plot(smallPeeks, bigPeeks):
+	# plot adjustments
+	plt.figure(figsize=(10,6),dpi=85,facecolor='w',edgecolor='k')
+	plt.plot(data,'-',label='no. 127')
+
+	# mark peeks in plot
+	for i in bigPeeks:
+		plt.axvspan(i[0], i[1], facecolor='r', alpha=0.2)
+	for i in smallPeeks:
 		plt.axvspan(i[0], i[1], facecolor='g', alpha=0.2)
 
-plt.show()
+	# show plot
+	plt.show()
