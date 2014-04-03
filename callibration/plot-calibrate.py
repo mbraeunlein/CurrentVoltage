@@ -4,6 +4,7 @@ import glob
 
 lst = sorted(glob.glob('cal-*.npy'))
 
+plt.figure()
 x=[]
 hndl = []
 for l in lst:
