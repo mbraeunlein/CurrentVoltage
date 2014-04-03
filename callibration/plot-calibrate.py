@@ -7,9 +7,9 @@ lst = sorted(glob.glob('cal-*.npy'))
 x=[]
 hndl = []
 for l in lst:
-    foo = np.load(l)
-    hndl.append(plt.plot(foo,'-',label=l[4:-4]))
-    x.append(np.mean(foo))
-    
+    rawData = np.load(l)
+    data = np.concatenate(np.array(rawData)[:,1].flatten())
+    x.append(np.mean(data))
 
+plt.plot(x,'-',label="mean")
 plt.show()
