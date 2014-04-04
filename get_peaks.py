@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
+plt.ion()
+
 ########################################################################
 def smooth(x,window_len=11,window='hanning'):
 	if x.ndim != 1:
@@ -35,7 +37,7 @@ def plot_data_peaks(data,indices,peak_max_value):
 			plt.axvspan(i, j, facecolor='g', alpha=0.15)
 	
 	plt.axis('tight')
-	plt.ylim((180,np.ceil(max(data)/100)*100))
+	#~ plt.ylim((180,np.ceil(max(data)/100)*100))
 	#~ plt.axis(v=[0,len(data),0,np.ceil(max(data)/100)*100])
 	plt.subplots_adjust(left=0.05,right=0.97,bottom=0.05,top=0.97,wspace=0.1,hspace=0.1)
 	plt.show()
@@ -77,8 +79,12 @@ rawData = np.load( filename )
 tme  = rawData[:,0]
 dta  = np.concatenate(np.array(rawData)[:,1].flatten())
 
+clbr_min = np.mean(np.concatenate(np.array(np.load('cal-0.0V.npy'))[:,1].flatten()))
+clbr_max = np.mean(np.concatenate(np.array(np.load('cal-1.0V.npy'))[:,1].flatten()))
+
 # smooth data
 data = smooth(dta, 5)
+data_scaled = 1000.0 /10.0 * (data-clbr_min)/(clbr_max-clbr_min)
 
 indices = get_peaks(data,threshold,10)
 
@@ -91,4 +97,4 @@ peak_area = np.array([np.trapz(data[i:j]) for i,j in indices])
 	
 
 # plot data, highlight peaks
-plot_data_peaks(data,indices,peak_max_value)
+plot_data_peaks(data_scaled,indices,peak_max_value)

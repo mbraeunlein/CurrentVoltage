@@ -67,9 +67,6 @@ for i in indices:
 	else:
 		smallPeeks.append(i)
 
-# plot data
-plot(smallPeeks, bigPeeks)
-
 def plot(smallPeeks, bigPeeks):
 	# plot adjustments
 	plt.figure(figsize=(10,6),dpi=85,facecolor='w',edgecolor='k')
@@ -83,3 +80,6 @@ def plot(smallPeeks, bigPeeks):
 
 	# show plot
 	plt.show()
+	
+# plot data
+plot(smallPeeks, bigPeeks)
