@@ -5,6 +5,8 @@ import glob
 
 plt.ion()
 
+plt.ion()
+
 ########################################################################
 def smooth(x,window_len=11,window='hanning'):
 	if x.ndim != 1:
