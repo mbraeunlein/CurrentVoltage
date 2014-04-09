@@ -3,9 +3,6 @@ import matplotlib.pyplot as plt
 import sys
 import glob
 
-plt.ion()
-
-plt.ion()
 
 ########################################################################
 def smooth(x,window_len=11,window='hanning'):
@@ -84,24 +81,25 @@ dta  = np.concatenate(np.array(rawData)[:,1].flatten())
 
 # get callibration: 214 -- 3788
 resistor = 10.0		# 10 Ohm resistor
-clbr_min = np.mean(np.load('callibration/old/cal-0.0V.npy'))
-clbr_max = np.mean(np.load('callibration/old/cal-1.0V.npy'))
-#~ clbr_min = np.mean(np.concatenate(np.array(np.load('callibration/cal-0.0V.npy'))[:,1].flatten()))
-#~ clbr_max = np.mean(np.concatenate(np.array(np.load('callibration/cal-1.0V.npy'))[:,1].flatten()))
+#~ clbr_min = np.mean(np.load('callibration/old/cal-0.0V.npy'))
+#~ clbr_max = np.mean(np.load('callibration/old/cal-1.0V.npy'))
+clbr_min = np.mean(np.concatenate(np.array(np.load('cal-0.0V.npy'))[:,1].flatten()))
+clbr_max = np.mean(np.concatenate(np.array(np.load('cal-1.0V.npy'))[:,1].flatten()))
 
 # smooth data
 data = smooth(dta, 5)
 data_scaled_mA = 1000.0/resistor*(data - clbr_min)/(clbr_max - clbr_min)
 
 # extract peaks peaks
-indices = get_peaks(data,threshold,10)
+#~ indices = get_peaks(data,threshold,10)
 
 # extract peak max and mean values
-peak_max_value  = np.array([max(data[i:j]) for i,j in indices], 'int')
-peak_mean_value = np.array([np.mean(data[i:j]) for i,j in indices], 'int')
+#~ peak_max_value  = np.array([max(data[i:j]) for i,j in indices], 'int')
+#~ peak_mean_value = np.array([np.mean(data[i:j]) for i,j in indices], 'int')
 
 # compute area-under-curve for each peak
-peak_area = np.array([np.trapz(data_scaled_mA[i:j]) for i,j in indices])
+#~ peak_area = np.array([np.trapz(data_scaled_mA[i:j]) for i,j in indices])
 
 # plot data, highlight peaks
-plot_data_peaks(data_scaled_mA,indices,peak_max_value)
+#~ plot_data_peaks(data_scaled_mA,indices,peak_max_value)
+plot_data_peaks(data_scaled_mA,[],[])
