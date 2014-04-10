@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
-import glob
+import sys, glob
+import datetime
 import pdb
 
 plt.ion()
@@ -30,7 +30,9 @@ def smooth(x,window_len=11,window='hanning'):
 ########################################################################
 def plot_data_peaks(data,threshold_2,indices,peak_max_value):
 	fig = plt.figure(figsize=(15,8),dpi=85,facecolor='w',edgecolor='k')
-	plt.plot(data,'-',label='no. 127')
+	plt.plot(data,'-')
+	plt.axis('tight')
+	plt.ylim(( 0, np.int(np.ceil(np.max(data_scaled_mA))/10+2)*10 ))
 	
 	for (i,j),pmv in zip(indices, peak_max_value):
 		if pmv > threshold_2:
@@ -38,13 +40,27 @@ def plot_data_peaks(data,threshold_2,indices,peak_max_value):
 		else:
 			plt.axvspan(i, j, facecolor='g', alpha=0.15)
 	
-	plt.axis('tight')
-	plt.ylim(( 0, np.int(np.ceil(np.max(data_scaled_mA))/10+2)*10 ))
-	#~ plt.ylim((0,115))
-	#~ plt.axis(v=[0,len(data),0,np.ceil(max(data)/100)*100])
 	plt.subplots_adjust(left=0.05,right=0.97,bottom=0.05,top=0.97,wspace=0.1,hspace=0.1)
 	plt.show()
 
+########################################################################
+def plot_data_subset(data, tdm, ymn=0, ymx=115):
+	fig, ax = plt.subplots(figsize=(5,5),dpi=85,facecolor='w',edgecolor='k')
+	ax.plot(data,'-')
+	
+	#~ ticks = ax.get_xticks()
+	#~ labels = [item.get_text() for item in ax.get_xticklabels()]
+	new_labels = np.arange(0,int(np.round(tdm*len(data),0)), 5)
+	new_label_pos = np.arange(0,int(np.round(tdm*len(data),0)), 5)/tdm
+	ax.xaxis.set_ticks(new_label_pos)
+	ax.xaxis.set_ticklabels(new_labels)
+	
+	ax.xlabel('milliseconds')
+	ax.ylabel('')
+	plt.axis('tight'); plt.ylim(( ymn, ymx )); plt.grid(axis='y');
+	plt.subplots_adjust(left=0.08,right=0.95,bottom=0.06,top=0.97,wspace=0.1,hspace=0.1)
+	plt.show()
+	
 ########################################################################
 def get_peaks(data,threshold,gap_threshold):
 	# apply threshold, result is a boolean array
@@ -86,6 +102,9 @@ rawData = np.load( filename )
 tme  = rawData[:,0]
 dta  = np.concatenate(np.array(rawData)[:,1].flatten())
 
+tmedelta = np.array([t.total_seconds() for t in np.diff(tme)])*1000
+tmedeltamean = np.mean(tmedelta)/len(rawData[0][1])
+
 # get callibration range
 resistor = 10.0		# 10 Ohm resistor
 clbr_min = np.mean(np.concatenate(np.array(np.load('cal-0.0V.npy'))[:,1].flatten()))
@@ -109,3 +128,7 @@ peak_area = np.array([np.trapz(data_scaled_mA[i:j]) for i,j in indices])
 # plot data, highlight peaks
 plot_data_peaks(data_scaled_mA,threshold_2,indices,peak_max_value)
 #~ plot_data_peaks(data_scaled_mA[:len(data_scaled_mA)/2],[],[])
+
+#~ plot_data_subset(data_scaled_mA[960000:961200],tmedeltamean)
+#~ plot_data_subset(data_scaled_mA[598900:600100],tmedeltamean)
+#~ plot_data_subset(data_scaled_mA[363300:364500],tmedeltamean)
