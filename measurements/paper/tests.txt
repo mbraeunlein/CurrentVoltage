@@ -2,6 +2,6 @@ Test 1:   Microcontroller sampling, auto-sleep, RLE=2, Transcend 1GB
 Test 2:   Sensor sampling, auto-sleep, RLE=2, Transcend 1GB
 Test 3:   Sensor sampling, low/auto, RLE=2, Transcend 1GB
 Test 4:   Sensor sampling, low/auto, RLE=0, Transcend 1GB
-Test 5:   Sensor sampling, low/auto, RLE=2, Sandisk 1GB
+Test 5:   Sensor sampling, low/auto, RLE=2, Sandisk 2GB
 Test 6:   Sensor sampling, low/auto, RLE=2, Transcend 2GB
 Test 7:   OLED version, low/auto, RLE=2, die bessere Speicherkarte 1GB
