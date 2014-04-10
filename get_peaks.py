@@ -1,8 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
-import glob
+import sys, glob
+import datetime
+import pdb
 
+plt.ion()
 
 ########################################################################
 def smooth(x,window_len=11,window='hanning'):
@@ -26,22 +28,39 @@ def smooth(x,window_len=11,window='hanning'):
 	return y
 
 ########################################################################
-def plot_data_peaks(data,indices,peak_max_value):
+def plot_data_peaks(data,threshold_2,indices,peak_max_value):
 	fig = plt.figure(figsize=(15,8),dpi=85,facecolor='w',edgecolor='k')
-	plt.plot(data,'-',label='no. 127')
+	plt.plot(data,'-')
+	plt.axis('tight')
+	plt.ylim(( 0, np.int(np.ceil(np.max(data_scaled_mA))/10+2)*10 ))
 	
 	for (i,j),pmv in zip(indices, peak_max_value):
-		if pmv > 700:
+		if pmv > threshold_2:
 			plt.axvspan(i, j, facecolor='r', alpha=0.15)
 		else:
 			plt.axvspan(i, j, facecolor='g', alpha=0.15)
 	
-	plt.axis('tight')
-	#~ plt.ylim((180,np.ceil(max(data)/100)*100))
-	#~ plt.axis(v=[0,len(data),0,np.ceil(max(data)/100)*100])
 	plt.subplots_adjust(left=0.05,right=0.97,bottom=0.05,top=0.97,wspace=0.1,hspace=0.1)
 	plt.show()
 
+########################################################################
+def plot_data_subset(data, tdm, ymn=0, ymx=115):
+	fig, ax = plt.subplots(figsize=(5,5),dpi=85,facecolor='w',edgecolor='k')
+	ax.plot(data,'-')
+	
+	#~ ticks = ax.get_xticks()
+	#~ labels = [item.get_text() for item in ax.get_xticklabels()]
+	new_labels = np.arange(0,int(np.round(tdm*len(data),0)), 5)
+	new_label_pos = np.arange(0,int(np.round(tdm*len(data),0)), 5)/tdm
+	ax.xaxis.set_ticks(new_label_pos)
+	ax.xaxis.set_ticklabels(new_labels)
+	
+	ax.xlabel('milliseconds')
+	ax.ylabel('')
+	plt.axis('tight'); plt.ylim(( ymn, ymx )); plt.grid(axis='y');
+	plt.subplots_adjust(left=0.08,right=0.95,bottom=0.06,top=0.97,wspace=0.1,hspace=0.1)
+	plt.show()
+	
 ########################################################################
 def get_peaks(data,threshold,gap_threshold):
 	# apply threshold, result is a boolean array
@@ -55,6 +74,9 @@ def get_peaks(data,threshold,gap_threshold):
 
 	# second, concatenate peak start and stop indices
 	# note the +1 which fixes the diff-offset
+	#~ pdb.set_trace()
+	if belowthr[b2][0] > abovethr[b1][0]:
+		b1 = b1[1:]
 	indices = np.column_stack(( belowthr[b2], 
 						np.concatenate((abovethr[b1],[abovethr[-1]])) )) + 1
 
@@ -72,34 +94,41 @@ def get_peaks(data,threshold,gap_threshold):
 ########################################################################
 ### MAIN SCRIPT
 filename  = sys.argv[1]
-threshold = int(sys.argv[2])
+threshold_1 = float(sys.argv[2])
+threshold_2 = float(sys.argv[3])
 
 # load data; extract timestamps, raw sensor values
 rawData = np.load( filename )
 tme  = rawData[:,0]
 dta  = np.concatenate(np.array(rawData)[:,1].flatten())
 
-# get callibration: 214 -- 3788
+tmedelta = np.array([t.total_seconds() for t in np.diff(tme)])*1000
+tmedeltamean = np.mean(tmedelta)/len(rawData[0][1])
+
+# get callibration range
 resistor = 10.0		# 10 Ohm resistor
-#~ clbr_min = np.mean(np.load('callibration/old/cal-0.0V.npy'))
-#~ clbr_max = np.mean(np.load('callibration/old/cal-1.0V.npy'))
 clbr_min = np.mean(np.concatenate(np.array(np.load('cal-0.0V.npy'))[:,1].flatten()))
 clbr_max = np.mean(np.concatenate(np.array(np.load('cal-1.0V.npy'))[:,1].flatten()))
 
 # smooth data
 data = smooth(dta, 5)
 data_scaled_mA = 1000.0/resistor*(data - clbr_min)/(clbr_max - clbr_min)
+#~ data_scaled_mA = data
 
 # extract peaks peaks
-#~ indices = get_peaks(data,threshold,10)
+indices = get_peaks(data_scaled_mA,threshold_1,10)
 
 # extract peak max and mean values
-#~ peak_max_value  = np.array([max(data[i:j]) for i,j in indices], 'int')
-#~ peak_mean_value = np.array([np.mean(data[i:j]) for i,j in indices], 'int')
+peak_max_value  = np.array([max(data_scaled_mA[i:j]) for i,j in indices], 'int')
+peak_mean_value = np.array([np.mean(data_scaled_mA[i:j]) for i,j in indices], 'int')
 
 # compute area-under-curve for each peak
-#~ peak_area = np.array([np.trapz(data_scaled_mA[i:j]) for i,j in indices])
+peak_area = np.array([np.trapz(data_scaled_mA[i:j]) for i,j in indices])
 
 # plot data, highlight peaks
-#~ plot_data_peaks(data_scaled_mA,indices,peak_max_value)
-plot_data_peaks(data_scaled_mA,[],[])
+plot_data_peaks(data_scaled_mA,threshold_2,indices,peak_max_value)
+#~ plot_data_peaks(data_scaled_mA[:len(data_scaled_mA)/2],[],[])
+
+#~ plot_data_subset(data_scaled_mA[960000:961200],tmedeltamean)
+#~ plot_data_subset(data_scaled_mA[598900:600100],tmedeltamean)
+#~ plot_data_subset(data_scaled_mA[363300:364500],tmedeltamean)
