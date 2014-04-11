@@ -43,8 +43,8 @@ data = np.concatenate(np.array(rawData)[:,1].flatten())
 # 10 Ohm resistor
 resistor = 10.0	
 # scale the data according to callibration
-clbr_min = np.mean(np.concatenate(np.array(np.load('cal-0.0V.npy'))[:,1].flatten()))
-clbr_max = np.mean(np.concatenate(np.array(np.load('cal-1.0V.npy'))[:,1].flatten()))
+clbr_min = np.mean(np.concatenate(np.array(np.load('cal-0.0V-new.npy'))[:,1].flatten()))
+clbr_max = np.mean(np.concatenate(np.array(np.load('cal-1.0V-new.npy'))[:,1].flatten()))
 data = 1000.0/resistor*(data - clbr_min)/(clbr_max - clbr_min)
 
 # filter the data
