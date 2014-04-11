@@ -30,12 +30,12 @@ while (float(time.time() - start)) < float(seconds):
 		dta.append((t,buf))
 		dtamn.append(np.mean(buf))
 	except:
-		print "buff error"
+		pass
 	
 	try:
 		ydata = np.concatenate( (ydata, buf) )[len(buf):]
 	except:
-		print "error"
+		pass
 	
 port.close()
 print("finished reading")
