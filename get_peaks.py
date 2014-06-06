@@ -205,9 +205,9 @@ def plot_data_and_extract_peaks(filename,threshold_1,threshold_2, pltstf=False):
 ########################################################################
 ### MAIN SCRIPT
 
-#~ filename  = sys.argv[1]
-#~ threshold_1 = float(sys.argv[2])
-#~ threshold_2 = float(sys.argv[3])
-#~ plot_data_and_extract_peaks(filename,0.8, 6, False)
+filename  = sys.argv[1]
+threshold_1 = float(sys.argv[2])
+threshold_2 = float(sys.argv[3])
+plot_data_and_extract_peaks(filename,0.8, 6, True)
 
-plot_sdcard_peaks_boxplots([('test3',7.5),('test5',7.5),('test6',12)])
+#~ plot_sdcard_peaks_boxplots([('test3',7.5),('test5',7.5),('test6',12)])
