@@ -111,19 +111,21 @@ def get_peaks(data,threshold,gap_threshold):
 	# apply threshold, result is a boolean array
 	abovethr = np.where( data >= threshold )[0]
 	belowthr = np.where( data <  threshold )[0]
-
+	
+	pdb.set_trace()
+	
 	#### extract peaks
 	# first, find gaps in "above"/"below" labels (differences bigger than 1)
 	b1 = np.where( np.diff(abovethr)>1 )[0]
 	b2 = np.where( np.diff(belowthr)>1 )[0]
-
+	
 	# second, concatenate peak start and stop indices
 	# note the +1 which fixes the diff-offset
 	if belowthr[b2][0] > abovethr[b1][0]:
 		b1 = b1[1:]
 	indices = np.column_stack(( belowthr[b2], 
-						np.concatenate((abovethr[b1],[abovethr[-1]])) )) + 1
-
+					np.concatenate((abovethr[b1],[abovethr[-1]])) )) + 1
+	
 	# third, merge peaks if they are very close to eachother
 	indices_gaps = indices.flatten()[1:-1].reshape((-1,2))
 	gaps_to_preserve = np.where(np.diff(indices_gaps).flatten() > gap_threshold )[0]
@@ -153,15 +155,22 @@ def plot_data_and_extract_peaks(filename,threshold_1,threshold_2, threshold_3, p
 	
 	tmedelta = np.array([t.total_seconds() for t in np.diff(tme)])*1000
 	tmedeltamean = np.mean(tmedelta)/3300	# factor found by callibrating over oscilloscope
-
+	
 	# get callibration range
 	resistor = 10.0		# 10 Ohm resistor
 	if int(filename[-13:-12]) == 7:
 		clbr_min = np.mean(np.concatenate(np.array(np.load('cal-0.0V-for-oled.npy'))[:,1].flatten()))
 		clbr_max = np.mean(np.concatenate(np.array(np.load('cal-2.0V-for-oled.npy'))[:,1].flatten()))
+	elif int(filename[-13:-12]) in [8,9,0]:
+		# new tests with variable sampling frequency
+		clbr_min = np.mean(np.concatenate(np.array(np.load('cal-0.0V-new2.npy'))[:,1].flatten()))
+		clbr_max = np.mean(np.concatenate(np.array(np.load('cal-1.0V-new2.npy'))[:,1].flatten()))
 	else:
 		clbr_min = np.mean(np.concatenate(np.array(np.load('cal-0.0V-new.npy'))[:,1].flatten()))
 		clbr_max = np.mean(np.concatenate(np.array(np.load('cal-1.0V-new.npy'))[:,1].flatten()))
+		
+	
+	pdb.set_trace()
 	
 	# smooth data
 	data = smooth(dta, 5)
