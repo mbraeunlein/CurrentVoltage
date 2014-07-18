@@ -6,6 +6,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import os.path
 from scipy import misc
 
 
@@ -28,8 +29,8 @@ minpeakLength = 19
 # resistor characteristics
 resistor = 10.0	
 # calibration filenames
-fileMin = 'cal-0.0V.npy'
-fileMax = 'cal-1.0V.npy'
+fileMin = os.path.abspath(os.path.join(os.path.join(filename, os.pardir), os.pardir)) + '/cal-0.0V.npy'
+fileMax = os.path.abspath(os.path.join(os.path.join(filename, os.pardir), os.pardir)) + '/cal-1.0V.npy'
 
 
 ########################################################################
