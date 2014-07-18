@@ -28,8 +28,8 @@ minpeakLength = 19
 # resistor characteristics
 resistor = 10.0	
 # calibration filenames
-fileMin = 'cal-0.0V-new2.npy'
-fileMax = 'cal-1.0V-new2.npy'
+fileMin = 'cal-0.0V.npy'
+fileMax = 'cal-1.0V.npy'
 
 
 ########################################################################
