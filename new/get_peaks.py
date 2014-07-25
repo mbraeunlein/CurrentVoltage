@@ -65,8 +65,8 @@ def plot_data_subset_range(data, tdm, step=5, ymn=0, ymx=115):
 
 ########################################################################
 ### plotting SD-card-peaks
-def plot_data_subset(data, tdm, step=5, ymn=0, ymx=115):
-	fig, ax = plt.subplots(figsize=(4,5),dpi=85,facecolor='w',edgecolor='k')
+def plot_data_subset(data, tdm, step=5, ymn=0, ymx=115, ypad=0.7):
+	fig, ax = plt.subplots(figsize=(2.75,4),dpi=85,facecolor='w',edgecolor='k')
 	ax.plot(data,'-')
 	
 	new_labels = np.arange(0,int(np.round(tdm*len(data),0)), step)
@@ -75,34 +75,35 @@ def plot_data_subset(data, tdm, step=5, ymn=0, ymx=115):
 	ax.xaxis.set_ticklabels(new_labels)
 	ax.set_xlabel('milliseconds')
 	ax.set_ylabel(r'$mA$', fontsize='16')
-	ax.yaxis.labelpad = 0.7
+	ax.yaxis.labelpad = ypad
 	plt.axis('tight'); plt.ylim(( ymn, ymx )); plt.grid(axis='y');
-	plt.subplots_adjust(left=0.15,right=0.96,bottom=0.11,top=0.97,wspace=0.1,hspace=0.1)
+	plt.subplots_adjust(left=0.17,right=0.99,bottom=0.11,top=0.97,wspace=0.1,hspace=0.1)
 	plt.show()
 
 ########################################################################
-def plot_boxplot(data, ypad = 0.7):
-	fig = plt.figure(figsize=(4,5),dpi=85,facecolor='w',edgecolor='k')
-	plt.boxplot(data, widths=0.7)
+def plot_boxplot(data, ypad=0.7):
+	fig = plt.figure(figsize=(2.75,4),dpi=85,facecolor='w',edgecolor='k')
+	plt.boxplot(data, widths=0.5)
 	plt.grid(axis='y')
 	ax = plt.gca()
 	ax.tick_params(axis='both', which='major')#, labelsize=9)
-	ax.set_xticklabels(['1GB TS','2GB SD','2GB TS'])#, fontsize='9')#, rotation=45)
+	#~ ax.set_xticklabels(['1GB TS','2GB SD','2GB TS','1GB SB'])#, fontsize='9')#, rotation=45)
+	ax.set_xticklabels(['A','B','C','D'])#, fontsize='9')#, rotation=45)
 	ax.set_xlabel(' ')
 	ax.set_ylabel(r'$mA \cdot s$', fontsize='16')
 	ax.yaxis.labelpad = ypad
-	plt.subplots_adjust(left=0.15,right=0.96,bottom=0.11,top=0.97,wspace=0.1,hspace=0.1)
+	plt.subplots_adjust(left=0.25,right=0.99,bottom=0.11,top=0.97,wspace=0.1,hspace=0.1)
 
 ########################################################################
 def plot_sdcard_peaks_boxplots(filenamelist):
 	
 	pa = []
 	#~ pdb.set_trace()
-	for filename,thr_3 in filenamelist:
-		pth = 'measurements/paper2/' + filename + '/voltage.npy'
-		thr_1 = 0.8; thr_2 = 20.0
-		pa_tmp = plot_data_and_extract_peaks(pth, thr_1, thr_2, False)
-		pa.append( pa_tmp[pa_tmp > thr_3])
+	for filename,thr in filenamelist:
+		pth = filename + '/voltage.npy'
+		pa_tmp = plot_data_and_extract_peaks(pth, 0.5, 1.0, 16.0, False)
+		#~ pa.append( pa_tmp[pa_tmp > thr])
+		pa.append( pa_tmp )
 	plot_boxplot(pa)
 	return pa
 
@@ -175,39 +176,35 @@ def plot_data_and_extract_peaks(filename,threshold_1,threshold_2, threshold_3, p
 		plot_data_peaks(data_scaled_mA,threshold_2,threshold_3,indices,peak_max_value)
 	
 	
+	
 	bigPeaksN  = len( peak_area_mAs[peak_max_value >= threshold_3] )
 	smallPeaksN= len( peak_area_mAs[peak_max_value <  threshold_3] )
 	totalArea  = np.trapz(data_scaled_mA * tmedeltamean / 1000 )
 	bigArea    = sum(peak_area_mAs[peak_max_value >= threshold_3])
 	smallArea  = sum(peak_area_mAs[peak_max_value <  threshold_3])
-	
-	if int(filename[-13:-12]) == 7:
-		OLEDPeakN  = len( peak_area_mAs[(peak_max_value >= threshold_3)] )
-		OLEDArea   = sum( peak_area_mAs[(peak_max_value >= threshold_3)] )
-
-		bigPeaksN  = len( peak_area_mAs[(peak_max_value >= threshold_2) & (peak_max_value < threshold_3)] )
-		bigArea    = sum( peak_area_mAs[(peak_max_value >= threshold_2) & (peak_max_value < threshold_3)] )
-
-		smallPeaksN= len( peak_area_mAs[(peak_max_value >  threshold_1) & (peak_max_value < threshold_2)] )
-		smallArea  = sum( peak_area_mAs[(peak_max_value >  threshold_1) & (peak_max_value < threshold_2)] )
-
-		totalArea  = np.trapz(data_scaled_mA * tmedeltamean / 1000 )
-
-		print "number of OLED peaks   :\t", OLEDPeakN
-		print "area under OLED peaks  :\t", round(OLEDArea,2),   "\t( ", round(OLEDArea   / (totalArea / 100.0), 1) ,"% )"
+	#~ if int(filename[-13:-12]) == 7:
+		#~ OLEDPeakN  = len( peak_area_mAs[(peak_max_value >= threshold_3)] )
+		#~ OLEDArea   = sum( peak_area_mAs[(peak_max_value >= threshold_3)] )
+		#~ bigPeaksN  = len( peak_area_mAs[(peak_max_value >= threshold_2) & (peak_max_value < threshold_3)] )
+		#~ bigArea    = sum( peak_area_mAs[(peak_max_value >= threshold_2) & (peak_max_value < threshold_3)] )
+		#~ smallPeaksN= len( peak_area_mAs[(peak_max_value >  threshold_1) & (peak_max_value < threshold_2)] )
+		#~ smallArea  = sum( peak_area_mAs[(peak_max_value >  threshold_1) & (peak_max_value < threshold_2)] )
+		#~ totalArea  = np.trapz(data_scaled_mA * tmedeltamean / 1000 )
+		#~ print "number of OLED peaks   :\t", OLEDPeakN
+		#~ print "area under OLED peaks  :\t", round(OLEDArea,2),   "\t( ", round(OLEDArea   / (totalArea / 100.0), 1) ,"% )"
 
 	# print statistics of the data
-	print "number of big peaks   :\t", bigPeaksN
-	print "number of small peaks :\t", smallPeaksN
-	print "area under curve      :\t", round(totalArea,2)
-	print "area under big peaks  :\t", round(bigArea,2),   "\t( ", round(bigArea   / (totalArea / 100.0), 1) ,"% )"
-	print "area under small peaks:\t", round(smallArea,2), "\t( ", round(smallArea / (totalArea / 100.0), 1) ,"% )"
-	print "area without peaks    :\t", round((totalArea - (bigArea + smallArea)),2), \
-								 "\t( ", round((totalArea - (bigArea + smallArea)) / (totalArea / 100), 1) ,"% )"
-
+	#~ print "number of big peaks   :\t", bigPeaksN
+	#~ print "number of small peaks :\t", smallPeaksN
+	#~ print "area under curve      :\t", round(totalArea,2)
+	#~ print "area under big peaks  :\t", round(bigArea,2),   "\t( ", round(bigArea   / (totalArea / 100.0), 1) ,"% )"
+	#~ print "area under small peaks:\t", round(smallArea,2), "\t( ", round(smallArea / (totalArea / 100.0), 1) ,"% )"
+	#~ print "area without peaks    :\t", round((totalArea - (bigArea + smallArea)),2), \
+								 #~ "\t( ", round((totalArea - (bigArea + smallArea)) / (totalArea / 100), 1) ,"% )"
 	
-	print 'total consumption & SD writes & sampling'
-	print round(totalArea,2) , round(bigArea,2), round(100*bigArea/totalArea,1),"%", round(smallArea,2), round(100*smallArea/totalArea,1),"%"
+	#~ print 'total consumption & SD writes & sampling'
+	#~ print round(totalArea,2) , round(bigArea,2), round(100*bigArea/totalArea,1),"%", round(smallArea,2), round(100*smallArea/totalArea,1),"%"
+	#~ print round(totalArea,2) ,"&", round(bigArea,2),"&", round(100*bigArea/totalArea,1),"\\%","&", round(smallArea,2),"&", round(100*smallArea/totalArea,1),"\\%"
 	
 	### plotting introduction figure ( PIC sampling and SD write)
 	#~ plot_data_subset_range(data_scaled_mA[734600:737850],tmedeltamean,step=10,ymn=0,ymx=37)		# test 1
@@ -219,12 +216,14 @@ def plot_data_and_extract_peaks(filename,threshold_1,threshold_2, threshold_3, p
 	#~ plot_data_subset_range(data_scaled_mA[911000:915000],tmedeltamean,step=10,ymn=0,ymx=150)		# paper2/test7
 	
 	### plotting SD write peaks for differend SD cards:
-	#~ plot_data_subset(data_scaled_mA[960000:961200],tmedeltamean)	# test 3
-	#~ plot_data_subset(data_scaled_mA[598900:600100],tmedeltamean)	# test 5
-	#~ plot_data_subset(data_scaled_mA[363300:364500],tmedeltamean)	# test 6
+	#~ plot_data_subset(data_scaled_mA[2584600:2584600+1200],tmedeltamean,step=5, ymn=0, ymx=115, ypad=-7)	# test 3
+	#~ plot_data_subset(data_scaled_mA[2478070:2478070+1200],tmedeltamean,step=5, ymn=0, ymx=115, ypad=-7)	# test 5
+	#~ plot_data_subset(data_scaled_mA[2777200:2777200+1200],tmedeltamean,step=5, ymn=0, ymx=115, ypad=-7)	# test 6
+	#~ plot_data_subset(data_scaled_mA[2081900:2081900+1200],tmedeltamean,step=5, ymn=0, ymx=115, ypad=-7)	# test 11
 	
-		
-	#~ return peak_area_mAs
+	#~ pdb.set_trace()
+	
+	return peak_area_mAs[peak_max_value >= threshold_3]
 ########################################################################
 ########################################################################
 
@@ -234,11 +233,19 @@ def plot_data_and_extract_peaks(filename,threshold_1,threshold_2, threshold_3, p
 ########################################################################
 ### MAIN SCRIPT
 
-filename    = sys.argv[1]
-threshold_1 = float(sys.argv[2])
-threshold_2 = float(sys.argv[3])
-threshold_3 = float(sys.argv[4])
-plot_data_and_extract_peaks(filename,threshold_1, threshold_2, threshold_3, True)
+#~ filename    = sys.argv[1]
+#~ threshold_1 = float(sys.argv[2])
+#~ threshold_2 = float(sys.argv[3])
+#~ threshold_3 = float(sys.argv[4])
+#~ 
+#~ plot_data_and_extract_peaks(filename,threshold_1, threshold_2, threshold_3, False)
+#~ 
+pamas=[]
+for i in range(1,12):
+	if i == 7:
+		continue
+	pamas.append( plot_data_and_extract_peaks(str(i)+'/voltage.npy',0.5,1.0,10.0,True) )
+
 
 #~ acc  = np.load(filename[:-11] + 'log' + filename[-4:]).view(np.recarray)
 #~ fig = plt.figure(figsize=(15,8),dpi=85,facecolor='w',edgecolor='k')
@@ -247,3 +254,4 @@ plot_data_and_extract_peaks(filename,threshold_1, threshold_2, threshold_3, True
 #~ plt.ylim((0,255))
 
 #~ peak_area_mAs = plot_sdcard_peaks_boxplots([('test3',0.16),('test5',0.16),('test6',0.25)])
+#~ peak_area_mAs = plot_sdcard_peaks_boxplots([('3',0.16),('5',0.16),('6',0.25),('11',0.16)])
