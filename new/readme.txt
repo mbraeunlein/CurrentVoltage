@@ -12,3 +12,9 @@ No. & Sensor  & Sampling  & Frequency  & LPM        & RLE & SD-card
 11  & Basic   &  FIFO     & 100Hz      & low/auto   & 2   & SB 1Gb
 
 Test 3 und 10 sind gleich?
+
+12  & Basic   &  PIC 10ms & 100Hz      & low-power  & 2   & SB 1Gb
+13  & Basic   &  PIC 10ms & 100Hz      & low-power  & 2   & TS 1Gb
+14  & Basic   &  FIFO     & 100Hz      & low-power  & 2   & SB 1Gb
+15  & Basic   &  FIFO     & 100Hz      & low-power  & 2   & TS 1Gb
+
