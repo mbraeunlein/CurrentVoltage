@@ -233,18 +233,18 @@ def plot_data_and_extract_peaks(filename,threshold_1,threshold_2, threshold_3, p
 ########################################################################
 ### MAIN SCRIPT
 
-#~ filename    = sys.argv[1]
-#~ threshold_1 = float(sys.argv[2])
-#~ threshold_2 = float(sys.argv[3])
-#~ threshold_3 = float(sys.argv[4])
+filename    = sys.argv[1]
+threshold_1 = float(sys.argv[2])
+threshold_2 = float(sys.argv[3])
+threshold_3 = float(sys.argv[4])
+
+plot_data_and_extract_peaks(filename,threshold_1, threshold_2, threshold_3, True)
 #~ 
-#~ plot_data_and_extract_peaks(filename,threshold_1, threshold_2, threshold_3, False)
-#~ 
-pamas=[]
-for i in range(1,12):
-	if i == 7:
-		continue
-	pamas.append( plot_data_and_extract_peaks(str(i)+'/voltage.npy',0.5,1.0,10.0,True) )
+#~ pamas=[]
+#~ for i in range(1,12):
+	#~ if i == 7:
+		#~ continue
+	#~ pamas.append( plot_data_and_extract_peaks(str(i)+'/voltage.npy',0.5,1.0,10.0,True) )
 
 
 #~ acc  = np.load(filename[:-11] + 'log' + filename[-4:]).view(np.recarray)
