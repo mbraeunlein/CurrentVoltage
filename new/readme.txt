@@ -1,4 +1,7 @@
-No. & Sensor  & Sampling  & Frequency  & LPM        & RLE & SD-card
+No. & Sensor  & Sampling  & Frequency  & LPM        & RLE & SD-car
+
+
+Sensor Nr. 139
 
 1   & Basic   &  PIC 10ms & 100Hz      & normal     & 2   & TS 1Gb
 2   & Basic   &  FIFO     & 100Hz      & auto       & 2   & TS 1Gb
@@ -11,7 +14,6 @@ No. & Sensor  & Sampling  & Frequency  & LPM        & RLE & SD-card
 9   & Basic   &  FIFO     &  50Hz      & low/auto   & 2   & TS 1Gb
 10  & Basic   &  FIFO     & 100Hz      & low/auto   & 2   & TS 1Gb
 11  & Basic   &  FIFO     & 100Hz      & low/auto   & 2   & SB 1Gb
-
 12  & Basic   &  PIC 10ms & 100Hz      & low-power  & 2   & SB 1Gb
 13  & Basic   &  PIC 10ms & 100Hz      & low-power  & 2   & TS 1Gb
 14  & Basic   &  FIFO     & 100Hz      & low-power  & 2   & SB 1Gb
@@ -19,3 +21,14 @@ No. & Sensor  & Sampling  & Frequency  & LPM        & RLE & SD-card
 16  & Basic   &  PIC 10ms & 100Hz      & low-power  & 2   & SB2 1Gb
 17  & Basic   &  FIFO     & 100Hz      & low-power  & 2   & SB2 1Gb
 
+
+Sensor Nr. 103
+
+18  & Basic   &  PIC 10ms & 100Hz      & normal     & 2   & TS 1Gb
+19  & Basic   &  FIFO     & 100Hz      & low-power  & 2   & TS 1Gb
+
+
+Sensor Nr. 126
+
+20  & Basic   &  PIC 10ms & 100Hz      & normal     & 2   & TS 1Gb
+21  & Basic   &  FIFO     & 100Hz      & low-power  & 2   & TS 1Gb
