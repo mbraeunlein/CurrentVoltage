@@ -8,6 +8,31 @@ import pdb
 
 plt.ion()
 
+from scipy.signal import butter, lfilter, filtfilt
+
+
+def butter_bandpass(lowcut, highcut, fs, order):
+	nyq = 0.5 * fs
+	low = lowcut / nyq
+	high = highcut / nyq
+	b, a = butter(order, [low, high], btype='band')
+	return b, a
+
+def butter_bandpass_filter(data, lowcut, highcut, fs, order):
+	b, a = butter_bandpass(lowcut, highcut, fs, order)
+	#~ y = lfilter(b, a, data)
+	y = filtfilt(b, a, data)
+	return y
+
+def butt(data,N=2,Wn=0.01):
+	# design filter
+	#~ N  = 2    # Filter order
+	#~ Wn = 0.01 # Cutoff frequency
+	B, A = butter(N, Wn, output='ba')
+	 
+	# apply the filter
+	return filtfilt(B,A, data)
+	
 ########################################################################
 def smooth(x,window_len=11,window='hanning'):
 	if x.ndim != 1:
@@ -118,6 +143,8 @@ def get_peaks(data,threshold,gap_threshold):
 	b1 = np.where( np.diff(abovethr)>1 )[0]
 	b2 = np.where( np.diff(belowthr)>1 )[0]
 	
+	#~ pdb.set_trace()
+	
 	# second, concatenate peak start and stop indices
 	# note the +1 which fixes the diff-offset
 	if belowthr[b2][0] > abovethr[b1][0]:
@@ -145,7 +172,10 @@ def plot_data_and_extract_peaks(filename,threshold_1,threshold_2, threshold_3, p
 	# load data; extract timestamps, raw sensor values
 	rawData = np.load( filename )
 	tme  = rawData[:,0]
-	dta  = np.concatenate(np.array(rawData)[:,1].flatten())
+	data  = np.concatenate(np.array(rawData)[:,1].flatten())
+	
+	if np.any(data < 180):
+		data  = data[ : np.where( data < 180 )[0][0] ]
 	
 	refvolt = 1.0
 	
@@ -154,15 +184,20 @@ def plot_data_and_extract_peaks(filename,threshold_1,threshold_2, threshold_3, p
 	
 	# get callibration range
 	resistor = 10.0		# 10 Ohm resistor
-	clbr_min = np.mean(np.concatenate(np.array(np.load('cal-0.0V.npy'))[:,1].flatten()))
-	clbr_max = np.mean(np.concatenate(np.array(np.load('cal-1.0V.npy'))[:,1].flatten()))
+	#~ clbr_min = np.min(np.concatenate(np.array(np.load('cal-0.0V.npy'))[10:-10,1].flatten()))
+	#~ clbr_max = np.min(np.concatenate(np.array(np.load('cal-1.0V.npy'))[10:-10,1].flatten()))
+	clbr_min = np.concatenate(np.array(np.load('cal-0.0V.npy'))[10:-10,1].flatten())
+	clbr_max = np.concatenate(np.array(np.load('cal-1.0V.npy'))[10:-10,1].flatten())
+	clbr_min = np.min( butt(clbr_min, 1, 0.01) )
+	clbr_max = np.min( butt(clbr_max, 1, 0.01) )
 	
 	# smooth data
-	data = smooth(dta, 5)
-	data_scaled_mA = refvolt * 1000.0/resistor*(data - clbr_min)/(clbr_max - clbr_min)
+	#~ data = smooth(dta, 5)
+	data = butt(data, 1, 0.2)
+	data_scaled_mA = refvolt * 1000.0/resistor*(data - clbr_min)/(clbr_max - clbr_min) +0.12
 
-	pdb.set_trace()
-	
+	#~ pdb.set_trace()
+
 	# extract peaks peaks
 	indices = get_peaks(data_scaled_mA,threshold_1,10)
 
@@ -187,6 +222,9 @@ def plot_data_and_extract_peaks(filename,threshold_1,threshold_2, threshold_3, p
 	totalArea  = np.trapz(data_scaled_mA * tmedeltamean / 1000 )
 	bigArea    = sum(peak_area_mAs[peak_max_value >= threshold_3])
 	smallArea  = sum(peak_area_mAs[peak_max_value <  threshold_3])
+	
+	
+	
 	#~ if int(filename[-13:-12]) == 7:
 		#~ OLEDPeakN  = len( peak_area_mAs[(peak_max_value >= threshold_3)] )
 		#~ OLEDArea   = sum( peak_area_mAs[(peak_max_value >= threshold_3)] )
@@ -206,10 +244,10 @@ def plot_data_and_extract_peaks(filename,threshold_1,threshold_2, threshold_3, p
 	#~ print "area under small peaks:\t", round(smallArea,2), "\t( ", round(smallArea / (totalArea / 100.0), 1) ,"% )"
 	#~ print "area without peaks    :\t", round((totalArea - (bigArea + smallArea)),2), \
 								 #~ "\t( ", round((totalArea - (bigArea + smallArea)) / (totalArea / 100), 1) ,"% )"
-	
+		
 	#~ print 'total consumption & SD writes & sampling'
 	#~ print round(totalArea,2) , round(bigArea,2), round(100*bigArea/totalArea,1),"%", round(smallArea,2), round(100*smallArea/totalArea,1),"%"
-	#~ print round(totalArea,2) ,"&", round(bigArea,2),"&", round(100*bigArea/totalArea,1),"\\%","&", round(smallArea,2),"&", round(100*smallArea/totalArea,1),"\\%"
+	print round(totalArea,2) ,"&", bigPeaksN, "&", round(bigArea,2),"&", round(100*bigArea/totalArea,1),"\\%","&", smallPeaksN, "&", round(smallArea,2),"&", round(100*smallArea/totalArea,1),"\\%"
 	
 	### plotting introduction figure ( PIC sampling and SD write)
 	#~ plot_data_subset_range(data_scaled_mA[734600:737850],tmedeltamean,step=10,ymn=0,ymx=37)		# test 1
@@ -238,18 +276,18 @@ def plot_data_and_extract_peaks(filename,threshold_1,threshold_2, threshold_3, p
 ########################################################################
 ### MAIN SCRIPT
 
-filename    = sys.argv[1]
-threshold_1 = float(sys.argv[2])
-threshold_2 = float(sys.argv[3])
-threshold_3 = float(sys.argv[4])
-
-plot_data_and_extract_peaks(filename,threshold_1, threshold_2, threshold_3, True)
-#~ 
-#~ pamas=[]
-#~ for i in range(1,12):
-	#~ if i == 7:
-		#~ continue
-	#~ pamas.append( plot_data_and_extract_peaks(str(i)+'/voltage.npy',0.5,1.0,10.0,True) )
+#~ filename    = sys.argv[1]
+#~ threshold_1 = float(sys.argv[2])
+#~ threshold_2 = float(sys.argv[3])
+#~ threshold_3 = float(sys.argv[4])
+ 
+#~ plot_data_and_extract_peaks(filename,threshold_1, threshold_2, threshold_3, True)
+pamas=[]
+for i in range(1,12):
+	print i
+	if i == 2:
+		continue
+	pamas.append( plot_data_and_extract_peaks(str(i)+'/voltage.npy',0.7,1.5,10.0,False) )
 
 
 #~ acc  = np.load(filename[:-11] + 'log' + filename[-4:]).view(np.recarray)
